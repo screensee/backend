@@ -10,18 +10,18 @@ module.exports = {
     max_memory_restart: '1G',
     env: {
       NODE_ENV: 'development',
-      PORT: 3000,
+      PORT: 3001,
       MONGODB_URI: 'mongodb://localhost:27017',
       MQTT_SOCKET_PORT: 1883,
       MQTT_HTTP_PORT: 1884,
     },
     env_production: {
       NODE_ENV: 'production',
-      PORT: 3000,
+      PORT: 3001,
       MONGODB_URI: 'mongodb://localhost:27017',
       MQTT_SOCKET_PORT: 1883,
       MQTT_HTTP_PORT: 1884,
-    }
+    },
   }],
 
   deploy: {

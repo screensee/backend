@@ -11,8 +11,8 @@ module.exports = (onUpCallback) => {
 
   const settings = {
     interfaces: [
-      { type: 'mqtt', port: process.env.MQTT_SOCKET_PORT || 1883 },
-      { type: 'http', port: process.env.MQTT_HTTP_PORT || 1884, bundle: true },
+      { type: 'mqtt', port: Number(process.env.MQTT_SOCKET_PORT) || 1883 },
+      { type: 'http', port: Number(process.env.MQTT_HTTP_PORT) || 1884, bundle: true },
     ],
     backend: ascoltatore,
   };
