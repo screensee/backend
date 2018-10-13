@@ -18,10 +18,25 @@ roomSchema.methods.validPassword = function (password) {
   return result;
 };
 
+roomSchema.methods.addParticipant = function (name, cb) {
+  this.participants = [
+    ...this.participants,
+    name,
+  ];
+  this.save(cb);
+};
+
+roomSchema.methods.removeParticipant = function (name, cb) {
+  this.participants = this.participants.filter(elem => elem !== name);
+  this.save(cb);
+};
+
 roomSchema.statics.findByRoomId = function (id, cb) {
-  this.findOne({ id }, (err, room) => {
-    cb(err, room);
-  });
+  this.findOne({ id }, cb);
+};
+
+roomSchema.statics.findByPseudonym = function (pseudonym, cb) {
+  this.findOne({ pseudonym }, cb);
 };
 
 // create the model for users and expose it to our app
