@@ -41,7 +41,7 @@ router.get('/init', (req, res) => {
   }
 
   function sendUser(response, user) {
-    response.cookie('user', user.hash, { maxAge: 900000, httpOnly: true });
+    response.cookie('user', user.hash, { maxAge: 900000000, httpOnly: true });
     response.json(resCreator.success(user.name));
   }
 });

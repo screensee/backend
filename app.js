@@ -3,6 +3,7 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 // const session = require('express-session');
 // const passport = require('passport');
 const mongoose = require('mongoose');
@@ -35,7 +36,11 @@ mongoose.connect(configDB.url); // connect to our database
 
 // require('./config/passport')(passport); // pass passport for configuration
 
-
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Cookie'],
+}));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
