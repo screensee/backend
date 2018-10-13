@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const errCheck = require('../utils/errCheck');
 // define the schema for our user model
 const messageStoreSchema = mongoose.Schema({
   roomId: String,
   messages: {
     type: [{
+      id: String,
       text: String,
       timestamp: Number,
       author: String,
