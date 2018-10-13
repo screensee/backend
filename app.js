@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const index = require('./routes/index');
 const users = require('./routes/users');
 const rooms = require('./routes/rooms');
+const messages = require('./routes/messages');
 const userCheck = require('./middlewares/userCheck');
 
 const app = express();
@@ -26,11 +27,6 @@ mqttBroker(() => {
   mqttClient();
 });
 
-// const mqttClient = require('mqtt').connect(mqttBrokerConfig.url);
-
-
-// init mqtt routes
-// require('./routes/mqtt/main')(mqttClient);
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -50,8 +46,14 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/rooms', userCheck);
+
+app.use('/rooms', userCheck.auth);
 app.use('/rooms', rooms);
+
+app.use('/mess', userCheck.auth);
+app.use('/mess/:roomId', userCheck.isInRoom);
+app.use('/mess/post', userCheck.isInRoom);
+app.use('/mess', messages);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const resCreator = require('../utils/resCreator');
 const Room = require('../models/room');
-const User = require('../models/user');
-
+const MessageStore = require('../models/messageStore');
 
 function getRoomResponse(room) {
   return {
@@ -77,8 +76,6 @@ function createRoom(request, response) {
   newRoom.id = Math.random().toString().replace('0.', '');
   newRoom.videoLink = videoLink || '';
   newRoom.pseudonym = pseudonym || '';
-
-  // TODO: add user that create this
   newRoom.participants = [user.name];
 
   if (password) {
@@ -88,6 +85,9 @@ function createRoom(request, response) {
     if (err) {
       throw err;
     }
+    const newMessageStore = new MessageStore();
+    newMessageStore.roomId = newRoom.id;
+    newMessageStore.save();
     response.json(resCreator.success(getRoomResponse(newRoom)));
   });
 }

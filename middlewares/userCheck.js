@@ -1,7 +1,9 @@
 const User = require('../models/user');
+const Room = require('../models/room');
 const resCreator = require('../utils/resCreator');
+const errCheck = require('../utils/errCheck');
 
-module.exports = (req, res, next) => {
+exports.auth = (req, res, next) => {
   const { user: userCookie } = req.cookies;
   if (userCookie) {
     User.findByHash(userCookie, (err, user) => {
@@ -21,4 +23,27 @@ module.exports = (req, res, next) => {
   } else {
     res.status(401).json(resCreator.error('You must be authorized'));
   }
+};
+
+exports.isInRoom = (req, res, next) => {
+  const { user: { name } } = req;
+  let roomId = '';
+  if (req.body.roomId) {
+    roomId = req.body.roomId; // eslint-disable-line
+  } else if (req.params.roomId) {
+    roomId = req.params.roomId; // eslint-disable-line
+  }
+
+  Room.findByRoomId(roomId, errCheck((err, room) => {
+    if (room) {
+      if (room.participants.includes(name)) {
+        next();
+      } else {
+        res.status(403).json(resCreator.error(`User ${name} does not consist in the room ${roomId}`));
+      }
+    } else {
+      res.status(404).json(resCreator.error(`Could not find room ${roomId}`));
+    }
+  }));
+
 };
