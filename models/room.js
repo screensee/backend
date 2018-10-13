@@ -31,6 +31,15 @@ roomSchema.methods.removeParticipant = function (name, cb) {
   this.save(cb);
 };
 
+roomSchema.methods.update = function (data, cb) {
+  Object.keys(data).forEach((key) => {
+    if (data[key] !== undefined) {
+      this[key] = data[key];
+    }
+  });
+  this.save(cb);
+};
+
 roomSchema.statics.findByRoomId = function (id, cb) {
   this.findOne({ id }, cb);
 };
@@ -38,6 +47,7 @@ roomSchema.statics.findByRoomId = function (id, cb) {
 roomSchema.statics.findByPseudonym = function (pseudonym, cb) {
   this.findOne({ pseudonym }, cb);
 };
+
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('Room', roomSchema);

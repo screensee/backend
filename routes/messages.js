@@ -3,6 +3,9 @@ const md5 = require('md5');
 const errCheck = require('../utils/errCheck');
 const resCreator = require('../utils/resCreator');
 const MessageStore = require('../models/messageStore');
+const execCB = require('../utils/callMqttCallback');
+
+let callbacks = {};
 
 router.get('/:roomId', (req, res) => {
   const { roomId } = req.params;
@@ -22,6 +25,7 @@ router.post('/post', (req, res) => {
       const message = createMessage(text, name);
       store.addMessage(message, errCheck(() => {
         res.json(resCreator.success(message));
+        execCB(callbacks.onMessage(roomId, message));
       }));
     } else {
       res.status(404).json(resCreator.error(`Could not find messages for room ${roomId}`));
@@ -38,4 +42,7 @@ function createMessage(text, name) {
   };
 }
 
-module.exports = router;
+exports.router = router;
+exports.setCallbacks = (cbs) => {
+  callbacks = cbs;
+};

@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const generateName = require('sillyname');
 const resCreator = require('../utils/resCreator');
+const errCheck = require('../utils/errCheck');
 const Room = require('../models/room');
 const MessageStore = require('../models/messageStore');
 
-function getRoomResponse(room) {
+function createRoomResponse(room) {
   return {
     id: room.id,
     participants: room.participants,
@@ -21,7 +22,7 @@ router.get('/id/:roomId', function (req, res) {
         throw error;
       }
       if (room) {
-        res.json(resCreator.success(getRoomResponse(room)));
+        res.json(resCreator.success(createRoomResponse(room)));
       } else {
         res.status(404).json(resCreator.error(`Could not find the room with id: ${roomId}`));
       }
@@ -39,7 +40,7 @@ router.get('/:pseudonym', (req, res) => {
         throw error;
       }
       if (room) {
-        res.json(resCreator.success(getRoomResponse(room)));
+        res.json(resCreator.success(createRoomResponse(room)));
       } else {
         res.status(404).json(resCreator.error(`Could not find the room with pseudonym: ${pseudonym}`));
       }
@@ -47,6 +48,25 @@ router.get('/:pseudonym', (req, res) => {
   } else {
     res.status(400).json(resCreator.error('Pseudonym was not provided'));
   }
+});
+
+router.post('/update', (req, res) => {
+  const {
+    password, videoLink, pseudonym, roomId,
+  } = req.body;
+  Room.findByRoomId(roomId, errCheck((err, room) => {
+    if (room) {
+      room.update({
+        password,
+        videoLink,
+        pseudonym,
+      }, errCheck((err, updatedRoom) => {
+        res.json(resCreator.success(updatedRoom));
+      }));
+    } else {
+      res.status(404).json(resCreator(`Could not find room with id: ${roomId}`));
+    }
+  }));
 });
 
 router.post('/create', (req, res) => {
@@ -68,30 +88,30 @@ router.post('/create', (req, res) => {
       createRoom(req, res);
     }
   });
-});
 
-function createRoom(request, response) {
-  const { password, videoLink, pseudonym } = request.body;
-  const { user } = request;
-  const newRoom = new Room();
-  newRoom.id = Math.random().toString().replace('0.', '');
-  newRoom.videoLink = videoLink || '';
-  newRoom.pseudonym = pseudonym || generateName().split(' ')[0].toLowerCase();
-  newRoom.participants = [user.name];
+  function createRoom(request, response) {
+    const { password, videoLink, pseudonym } = request.body;
+    const { user } = request;
+    const newRoom = new Room();
+    newRoom.id = Math.random().toString().replace('0.', '');
+    newRoom.videoLink = videoLink || '';
+    newRoom.pseudonym = pseudonym || generateName().split(' ')[0].toLowerCase();
+    newRoom.participants = [user.name];
 
-  if (password) {
-    newRoom.password = password;
-  }
-  newRoom.save((err) => {
-    if (err) {
-      throw err;
+    if (password) {
+      newRoom.password = password;
     }
-    const newMessageStore = new MessageStore();
-    newMessageStore.roomId = newRoom.id;
-    newMessageStore.save();
-    response.json(resCreator.success(getRoomResponse(newRoom)));
-  });
-}
+    newRoom.save((err) => {
+      if (err) {
+        throw err;
+      }
+      const newMessageStore = new MessageStore();
+      newMessageStore.roomId = newRoom.id;
+      newMessageStore.save();
+      response.json(resCreator.success(createRoomResponse(newRoom)));
+    });
+  }
+});
 
 router.post('/join/:roomId', (req, res) => {
   addOrRemoveUser(true, req, res);
@@ -113,7 +133,7 @@ function addOrRemoveUser(isJoin, req, res) {
         if (err) {
           throw err;
         }
-        res.json(resCreator.success(getRoomResponse(room)));
+        res.json(resCreator.success(createRoomResponse(room)));
       });
     } else {
       res.status(404).json(resCreator.error(`Could not find the room with id: ${roomId}`));

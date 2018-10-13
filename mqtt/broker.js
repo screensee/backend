@@ -1,5 +1,6 @@
 const mosca = require('mosca');
 
+
 module.exports = (onUpCallback) => {
   const ascoltatore = {
     // using ascoltatore
@@ -35,6 +36,6 @@ module.exports = (onUpCallback) => {
   // fired when the mqtt server is ready
   function setup() {
     console.log('Mosca server is up and running');
-    onUpCallback();
+    onUpCallback(server);
   }
 };

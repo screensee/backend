@@ -16,15 +16,17 @@ const userCheck = require('./middlewares/userCheck');
 const app = express();
 
 const configDB = require('./config/database.js');
-const mqttBrokerConfig = require('./mqtt/client');
 
 // init mqtt
 const mqttBroker = require('./mqtt/broker');
-const mqttClient = require('./mqtt/client');
+const roomsMqtt = require('./routes/mqtt/rooms');
+// const mqttClient = require('./mqtt/client');
 
-mqttBroker(() => {
-  // server ready
-  mqttClient();
+mqttBroker((server) => {
+  const mqttCallbacks = {
+    ...roomsMqtt(server),
+  };
+  messages.setCallbacks(mqttCallbacks);
 });
 
 
@@ -53,7 +55,7 @@ app.use('/rooms', rooms);
 app.use('/mess', userCheck.auth);
 app.use('/mess/:roomId', userCheck.isInRoom);
 app.use('/mess/post', userCheck.isInRoom);
-app.use('/mess', messages);
+app.use('/mess', messages.router);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
