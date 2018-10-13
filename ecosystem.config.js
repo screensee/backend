@@ -11,14 +11,14 @@ module.exports = {
     env: {
       NODE_ENV: 'development',
       PORT: 3000,
-      MONGODB_URI: 'mongodb://localhost:27017/hackathon',
+      MONGODB_URI: 'mongodb://localhost:27017',
       MQTT_SOCKET_PORT: 1883,
       MQTT_HTTP_PORT: 1884,
     },
     env_production: {
       NODE_ENV: 'production',
       PORT: 3000,
-      MONGODB_URI: 'mongodb://localhost:27017/hackathon',
+      MONGODB_URI: 'mongodb://localhost:27017',
       MQTT_SOCKET_PORT: 1883,
       MQTT_HTTP_PORT: 1884,
     }

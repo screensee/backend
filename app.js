@@ -1,11 +1,10 @@
 const express = require('express');
 const path = require('path');
-const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const passport = require('passport');
+// const session = require('express-session');
+// const passport = require('passport');
 const mongoose = require('mongoose');
 
 const index = require('./routes/index');
@@ -15,7 +14,17 @@ const rooms = require('./routes/rooms');
 const app = express();
 
 const configDB = require('./config/database.js');
-const mqttBrokerConfig = require('./config/mqtt');
+const mqttBrokerConfig = require('./mqtt/client');
+
+// init mqtt
+const mqttBroker = require('./mqtt/broker');
+const mqttClient = require('./mqtt/client');
+
+mqttBroker(() => {
+  // server ready
+  mqttClient();
+});
+
 // const mqttClient = require('mqtt').connect(mqttBrokerConfig.url);
 
 
@@ -25,7 +34,7 @@ const mqttBrokerConfig = require('./config/mqtt');
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
 
-require('./config/passport')(passport); // pass passport for configuration
+// require('./config/passport')(passport); // pass passport for configuration
 
 
 app.use(logger('dev'));
@@ -34,23 +43,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.use(session({secret: 'secretsecretsecretsecretsecretsecretsecret'}));
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
+// app.use(session({ secret: 'secretsecretsecretsecretsecretsecretsecret' }));
+// app.use(passport.initialize());
+// app.use(passport.session()); // persistent login sessions
 
 app.use('/', index);
-app.use('/users', users(passport));
+app.use('/users', users);
 app.use('/rooms', rooms);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
