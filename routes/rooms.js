@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const generateName = require('sillyname');
 const resCreator = require('../utils/resCreator');
 const Room = require('../models/room');
 const MessageStore = require('../models/messageStore');
@@ -75,7 +76,7 @@ function createRoom(request, response) {
   const newRoom = new Room();
   newRoom.id = Math.random().toString().replace('0.', '');
   newRoom.videoLink = videoLink || '';
-  newRoom.pseudonym = pseudonym || '';
+  newRoom.pseudonym = pseudonym || generateName().split(' ')[0].toLowerCase();
   newRoom.participants = [user.name];
 
   if (password) {
