@@ -31,7 +31,7 @@ module.exports = (onUpCallback) => {
   // fired when a message is received
   server.on('published', function (packet, client) {
     if (packet.topic.indexOf('$SYS') === -1) {
-      console.log('Published', packet.payload);
+      // console.log('Published', packet.topic, packet.payload);
       // server.publish(packet);
     }
   });
