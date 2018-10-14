@@ -28,6 +28,7 @@ mqttBroker((server) => {
     ...roomsMqtt(server),
   };
   messages.setCallbacks(mqttCallbacks);
+  rooms.setCallbacks(mqttCallbacks);
 });
 
 
@@ -55,7 +56,7 @@ app.use('/', index);
 app.use('/users', users);
 
 app.use('/rooms', userCheck.auth);
-app.use('/rooms', rooms);
+app.use('/rooms', rooms.router);
 
 app.use('/mess', userCheck.auth);
 app.use('/mess/:roomId', userCheck.isInRoom);

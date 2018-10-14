@@ -4,6 +4,7 @@ const resCreator = require('../utils/resCreator');
 const errCheck = require('../utils/errCheck');
 const Room = require('../models/room');
 const MessageStore = require('../models/messageStore');
+const execCB = require('../utils/callMqttCallback');
 
 function createRoomResponse(room) {
   return {
@@ -13,6 +14,8 @@ function createRoomResponse(room) {
     pseudonym: room.pseudonym,
   };
 }
+
+let callbacks = {};
 
 router.get('/id/:roomId', function (req, res) {
   const { roomId } = req.params;
@@ -167,9 +170,21 @@ function addOrRemoveUser(isJoin, req, res) {
         ...createRoomResponse(room),
         isMaster: room.participants[0] === req.user.name,
       }));
+
+      // shit code
+      setTimeout(() => {
+        if (isJoin) {
+          callbacks.onUserJoin(room.id, req.user.name);
+        } else {
+          callbacks.onUserExit(room.id, req.user.name);
+        }
+      }, 1000);
     });
   }
 }
 
 
-module.exports = router;
+exports.router = router;
+exports.setCallbacks = (cbs) => {
+  callbacks = cbs;
+};

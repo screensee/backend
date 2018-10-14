@@ -19,8 +19,24 @@ module.exports = (server) => {
     });
   }
 
+  function onUserJoin(roomId, user) {
+    server.publish({
+      topic: `room/${roomId}/userJoin`,
+      payload: user,
+    });
+  }
+
+  function onUserExit(roomId, user) {
+    server.publish({
+      topic: `room/${roomId}/userExit`,
+      payload: user,
+    });
+  }
+
 
   return {
     onMessage,
+    onUserJoin,
+    onUserExit,
   };
 };

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const execCB = require('../utils/callMqttCallback');
 
 // define the schema for our user model
 const roomSchema = mongoose.Schema({
