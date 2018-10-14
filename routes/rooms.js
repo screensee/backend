@@ -108,7 +108,10 @@ router.post('/create', (req, res) => {
       const newMessageStore = new MessageStore();
       newMessageStore.roomId = newRoom.id;
       newMessageStore.save();
-      response.json(resCreator.success(createRoomResponse(newRoom)));
+      response.json(resCreator.success({
+        ...createRoomResponse(newRoom),
+        isMaster: true,
+      }));
     });
   }
 });
