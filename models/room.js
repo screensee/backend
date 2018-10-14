@@ -19,11 +19,15 @@ roomSchema.methods.validPassword = function (password) {
 };
 
 roomSchema.methods.addParticipant = function (name, cb) {
-  this.participants = [
-    ...this.participants,
-    name,
-  ];
-  this.save(cb);
+  if (this.participants.includes(name)) {
+    cb(null, this);
+  } else {
+    this.participants = [
+      ...this.participants,
+      name,
+    ];
+    this.save(cb);
+  }
 };
 
 roomSchema.methods.removeParticipant = function (name, cb) {
