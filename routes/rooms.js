@@ -131,17 +131,30 @@ function addOrRemoveUser(isJoin, req, res) {
       throw error;
     }
     if (room) {
-      const func = isJoin ? room.addParticipant : room.removeParticipant;
-      func.call(room, req.user.name, (err, room) => {
-        if (err) {
-          throw err;
-        }
-        res.json(resCreator.success(createRoomResponse(room)));
-      });
+      exec(room);
     } else {
-      res.status(404).json(resCreator.error(`Could not find the room with id: ${roomId}`));
+      Room.findByPseudonym(roomId, (error, room) => {
+        if (error) {
+          throw error;
+        }
+        if (room) {
+          exec(room);
+        } else {
+          res.status(404).json(resCreator.error(`Could not find the room with id: ${roomId}`));
+        }
+      });
     }
   });
+
+  function exec(room) {
+    const func = isJoin ? room.addParticipant : room.removeParticipant;
+    func.call(room, req.user.name, (err, room) => {
+      if (err) {
+        throw err;
+      }
+      res.json(resCreator.success(createRoomResponse(room)));
+    });
+  }
 }
 
 

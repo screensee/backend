@@ -24,10 +24,15 @@ module.exports = (onUpCallback) => {
     console.log('client connected', client.id);
   });
 
+  server.on('clientDisconnected', function (client) {
+    console.log('client disconnected', client.id);
+  });
+
   // fired when a message is received
   server.on('published', function (packet, client) {
     if (packet.topic.indexOf('$SYS') === -1) {
-      // console.log('Published', packet.payload);
+      console.log('Published', packet.payload);
+      // server.publish(packet);
     }
   });
 

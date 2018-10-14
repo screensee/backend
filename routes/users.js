@@ -25,25 +25,32 @@ router.get('/init', (req, res) => {
       sendUser(res, user);
     });
   }
-
-  function createUser(name, cb) {
-    const hash = md5(name);
-
-    const newUser = new User();
-    newUser.name = name;
-    newUser.hash = hash;
-    newUser.save((err) => {
-      if (err) {
-        throw err;
-      }
-      cb(newUser);
-    });
-  }
-
-  function sendUser(response, user) {
-    response.cookie('user', user.hash, { maxAge: 900000000, httpOnly: true });
-    response.json(resCreator.success(user.name));
-  }
 });
+
+router.post('/init', (req, res) => {
+  const { name } = req.body;
+  createUser(name, (user) => {
+    sendUser(res, user);
+  });
+});
+
+function createUser(name, cb) {
+  const hash = md5(name);
+
+  const newUser = new User();
+  newUser.name = name;
+  newUser.hash = hash;
+  newUser.save((err) => {
+    if (err) {
+      throw err;
+    }
+    cb(newUser);
+  });
+}
+
+function sendUser(response, user) {
+  response.cookie('user', user.hash, { maxAge: 900000000, httpOnly: true });
+  response.json(resCreator.success(user.name));
+}
 
 module.exports = router;
