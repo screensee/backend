@@ -22,7 +22,10 @@ router.get('/id/:roomId', function (req, res) {
         throw error;
       }
       if (room) {
-        res.json(resCreator.success(createRoomResponse(room)));
+        res.json(resCreator.success({
+          ...createRoomResponse(room),
+          isMaster: room.participants[0] === req.user.name,
+        }));
       } else {
         res.status(404).json(resCreator.error(`Could not find the room with id: ${roomId}`));
       }
@@ -40,7 +43,11 @@ router.get('/:pseudonym', (req, res) => {
         throw error;
       }
       if (room) {
-        res.json(resCreator.success(createRoomResponse(room)));
+        res.json(resCreator.success({
+          ...createRoomResponse(room),
+          isMaster: room.participants[0] === req.user.name,
+
+        }));
       } else {
         res.status(404).json(resCreator.error(`Could not find the room with pseudonym: ${pseudonym}`));
       }
@@ -61,7 +68,11 @@ router.post('/update', (req, res) => {
         videoLink,
         pseudonym,
       }, errCheck((err, updatedRoom) => {
-        res.json(resCreator.success(updatedRoom));
+        res.json(resCreator.success({
+          ...createRoomResponse(updatedRoom),
+          isMaster: room.participants[0] === req.user.name,
+
+        }));
       }));
     } else {
       res.status(404).json(resCreator(`Could not find room with id: ${roomId}`));
@@ -152,7 +163,10 @@ function addOrRemoveUser(isJoin, req, res) {
       if (err) {
         throw err;
       }
-      res.json(resCreator.success(createRoomResponse(room)));
+      res.json(resCreator.success({
+        ...createRoomResponse(room),
+        isMaster: room.participants[0] === req.user.name,
+      }));
     });
   }
 }
